@@ -1,65 +1,93 @@
-import  { useState, ChangeEvent, FormEvent } from 'react';
+import { useForm, SubmitHandler } from "react-hook-form";
+import "../css/regularForm.css";
 
 interface FormData {
   username: string;
   email: string;
-  password:string;
+  password: string;
+  gender: string;
 }
 
 function RegularForm() {
-  const [formData, setFormData] = useState<FormData>({
-    username: '',
-    email: '',
-    password: '',
-  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<FormData>();
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+  const passwordPattern =
+    /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[@#$%^&+=!])(?!.*\s).{8,20}$/;
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    alert(JSON.stringify(formData));
+  const onSubmit: SubmitHandler<FormData> = (data) => {
+    console.log(data);
+    reset();
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-        <h1>Change Me To React Hook Form</h1>
+    <form
+      className="form-layout flex flex-col gap-3"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <h1>React Hook Form</h1>
+      <input
+        {...register("username", {
+          required: "username is required",
+          minLength: {
+            value: 2,
+            message: "user name must contain more than 2 char",
+          },
+        })}
+        type="text"
+        id="username"
+        placeholder="Enter UserName"
+        className="px-4 py-2 rounded"
+      />
+      {errors.username && (
+        <p className="bg-red-500">{errors.username.message}</p>
+      )}
+
       <div>
-        <input
-          type="text"
-          id="username"
-          name="username"
-          placeholder='Enter UserName'
-          value={formData.username}
-          onChange={handleChange}
-        />
+        <select
+          {...register("gender", { required: "Please select your gender" })}
+        >
+          <option value="">Select gender</option>
+          <option value="female">female</option>
+          <option value="male">male</option>
+          <option value="other">other</option>
+        </select>
+        {errors.gender && <p>{errors.gender.message}</p>}
       </div>
-      <div>
-        <input
-          type="text"
-          id="email"
-          name="email"
-          placeholder='Enter Email'
-          value={formData.email}
-          onChange={handleChange}
-        />
-      </div>
-      <div>
-        <input
-          type="text"
-          id="password"
-          name="password"
-          placeholder='Enter Password'
-          value={formData.password}
-          onChange={handleChange}
-        />
-      </div>
-      <button type="submit">Submit</button>
+
+      <input
+        {...register("email")}
+        required
+        type="email"
+        id="email"
+        placeholder="Enter Email"
+        className="px-4 py-2 rounded"
+      />
+      {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+      <input
+        {...register("password", {
+          pattern: { value: passwordPattern, message: "invalid password" },
+        })}
+        required
+        type="text"
+        id="password"
+        placeholder="Enter Password"
+        className="px-4 py-2 rounded"
+      />
+      {errors.password && (
+        <p className="bg-red-500">{errors.password.message}</p>
+      )}
+      <button
+        disabled={isSubmitting}
+        type="submit"
+        className="bg-blue-500 disabled:bg-gray-500 py-2 rounded"
+      >
+        Submit
+      </button>
     </form>
   );
 }

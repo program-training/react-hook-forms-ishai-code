@@ -1,13 +1,12 @@
-import './App.css'
-import RegularForm from './components/RegularForm'
+import RegularForm from "./components/RegularForm";
+import "bootstrap/dist/css/bootstrap.css";
 
 function App() {
-
   return (
     <>
-    <RegularForm />
+      <RegularForm />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
